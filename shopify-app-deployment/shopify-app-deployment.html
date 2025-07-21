@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volume Pricing Tool - Shopify App</title>
+    
+    <!-- React App Assets -->
+    <script type="module" crossorigin src="./assets/index-3328060a.js"></script>
+    <link rel="stylesheet" href="./assets/index-2c7e60ae.css">
+    
+    <!-- Shopify Integration Styles -->
+    <style>
+        /* Shopify-specific overrides */
+        .shopify-app-container {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Ensure the app fits within Shopify's admin interface */
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+        
+        #root {
+            min-height: 100vh;
+        }
+        
+        /* Shopify admin theme integration */
+        .shopify-admin-theme {
+            --background-color: #fafafa;
+            --text-color: #4a4a4a;
+            --accent-color: #008060;
+            --button-color: #008060;
+            --border-color: #e0e0e0;
+            --highlight-color: #f5f5f5;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+        }
+        
+        /* Responsive design for Shopify admin */
+        @media (max-width: 768px) {
+            .shopify-app-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root" class="shopify-app-container"></div>
+    
+    <!-- Shopify Integration Script -->
+    <script>
+        // Shopify App Integration
+        class ShopifyVolumePricingApp {
+            constructor() {
+                this.init();
+            }
+            
+            init() {
+                // Wait for React app to load
+                this.waitForReactApp();
+                this.setupShopifyIntegration();
+            }
+            
+            waitForReactApp() {
+                const checkInterval = setInterval(() => {
+                    const rootElement = document.getElementById('root');
+                    if (rootElement && rootElement.children.length > 0) {
+                        clearInterval(checkInterval);
+                        this.onReactAppLoaded();
+                    }
+                }, 100);
+            }
+            
+            onReactAppLoaded() {
+                console.log('Volume Pricing React App loaded successfully');
+                this.injectShopifyData();
+            }
+            
+            setupShopifyIntegration() {
+                // Listen for Shopify admin events
+                if (window.Shopify && window.Shopify.Admin) {
+                    this.setupShopifyAdminEvents();
+                }
+                
+                // Setup message passing for iframe communication
+                window.addEventListener('message', (event) => {
+                    if (event.origin !== window.location.origin) {
+                        this.handleShopifyMessage(event.data);
+                    }
+                });
+            }
+            
+            setupShopifyAdminEvents() {
+                // Handle Shopify admin navigation
+                if (window.Shopify.Admin.Navigation) {
+                    window.Shopify.Admin.Navigation.on('navigate', (data) => {
+                        console.log('Shopify navigation:', data);
+                    });
+                }
+            }
+            
+            handleShopifyMessage(data) {
+                switch (data.type) {
+                    case 'GET_PRODUCTS':
+                        this.sendProductsToShopify();
+                        break;
+                    case 'SAVE_CONFIGURATION':
+                        this.saveConfigurationToShopify(data.config);
+                        break;
+                    case 'LOAD_CONFIGURATION':
+                        this.loadConfigurationFromShopify();
+                        break;
+                }
+            }
+            
+            injectShopifyData() {
+                // Inject Shopify-specific data into the React app
+                window.shopifyAppData = {
+                    store: this.getShopifyStoreInfo(),
+                    products: this.getShopifyProducts(),
+                    configuration: this.getShopifyConfiguration()
+                };
+                
+                // Trigger React app to reload with Shopify data
+                window.dispatchEvent(new CustomEvent('shopifyDataLoaded'));
+            }
+            
+            getShopifyStoreInfo() {
+                // Get store information from Shopify
+                return {
+                    name: window.Shopify?.shop || 'Test Store',
+                    currency: window.Shopify?.currency || 'USD',
+                    locale: window.Shopify?.locale || 'en'
+                };
+            }
+            
+            getShopifyProducts() {
+                // This would typically come from Shopify's API
+                // For now, return sample data
+                return [
+                    {
+                        id: 'tote-bag',
+                        name: 'Custom Tote Bag',
+                        basePrice: 9.99,
+                        variants: [
+                            { id: 'variant-1', title: '1-49 units', price: 9.99 },
+                            { id: 'variant-2', title: '50-99 units', price: 5.00 },
+                            { id: 'variant-3', title: '100-199 units', price: 2.50 },
+                            { id: 'variant-4', title: '200+ units', price: 1.99 }
+                        ]
+                    },
+                    {
+                        id: 'mug',
+                        name: 'Custom Mug',
+                        basePrice: 12.99,
+                        variants: [
+                            { id: 'variant-5', title: '1-24 units', price: 12.99 },
+                            { id: 'variant-6', title: '25-49 units', price: 8.99 },
+                            { id: 'variant-7', title: '50-99 units', price: 6.99 },
+                            { id: 'variant-8', title: '100+ units', price: 4.99 }
+                        ]
+                    }
+                ];
+            }
+            
+            getShopifyConfiguration() {
+                // Load saved configuration from Shopify metafields
+                const savedConfig = localStorage.getItem('volumePricingConfig');
+                return savedConfig ? JSON.parse(savedConfig) : null;
+            }
+            
+            saveConfigurationToShopify(config) {
+                // Save configuration to Shopify metafields
+                localStorage.setItem('volumePricingConfig', JSON.stringify(config));
+                
+                // In a real app, this would save to Shopify's API
+                console.log('Configuration saved:', config);
+                
+                // Notify Shopify admin
+                this.notifyShopifyAdmin('Configuration saved successfully');
+            }
+            
+            loadConfigurationFromShopify() {
+                const config = this.getShopifyConfiguration();
+                if (config) {
+                    // Send configuration back to React app
+                    window.dispatchEvent(new CustomEvent('shopifyConfigLoaded', {
+                        detail: config
+                    }));
+                }
+            }
+            
+            sendProductsToShopify() {
+                const products = this.getShopifyProducts();
+                // Send products back to Shopify admin
+                window.parent.postMessage({
+                    type: 'PRODUCTS_DATA',
+                    products: products
+                }, '*');
+            }
+            
+            notifyShopifyAdmin(message) {
+                // Show notification in Shopify admin
+                if (window.Shopify && window.Shopify.Admin && window.Shopify.Admin.Notification) {
+                    window.Shopify.Admin.Notification.show(message, 'success');
+                } else {
+                    console.log('Shopify notification:', message);
+                }
+            }
+        }
+        
+        // Initialize the Shopify app integration
+        document.addEventListener('DOMContentLoaded', function() {
+            new ShopifyVolumePricingApp();
+        });
+    </script>
+</body>
+</html> 

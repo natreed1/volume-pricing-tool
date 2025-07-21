@@ -1,0 +1,707 @@
+{% comment %}
+  Volume Pricing Tool Section - Ready for Shopify Theme Customizer
+  This section can be added to any page and configured through the theme customizer
+{% endcomment %}
+
+<div class="volume-pricing-section" id="volume-pricing-{{ section.id }}">
+  {% if section.settings.show_title %}
+    <div class="section-header">
+      <h2>{{ section.settings.title | default: 'Bulk Pricing' }}</h2>
+      {% if section.settings.subtitle != blank %}
+        <p>{{ section.settings.subtitle }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="volume-pricing-container">
+    <div class="product-selector">
+      <label for="product-select-{{ section.id }}">{{ section.settings.product_label | default: 'Select Product:' }}</label>
+      <select id="product-select-{{ section.id }}" class="product-dropdown">
+        {% for product in section.settings.products %}
+          <option value="{{ product.id }}">{{ product.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="pricing-display">
+      <h2 id="product-name-{{ section.id }}">{{ section.settings.default_product_name | default: 'Custom Tote Bag' }}</h2>
+      <div class="price-info">
+        <span class="current-price" id="current-price-{{ section.id }}">${{ section.settings.default_price | default: '9.99' }}</span>
+        <span class="per-unit">{{ section.settings.per_unit_text | default: 'per unit' }}</span>
+      </div>
+      <div class="total-price">
+        {{ section.settings.total_label | default: 'Total:' }} <span class="total-amount" id="total-price-{{ section.id }}">${{ section.settings.default_price | default: '9.99' }}</span>
+      </div>
+    </div>
+
+    <div class="quantity-selector">
+      <label for="quantity-slider-{{ section.id }}">{{ section.settings.quantity_label | default: 'Quantity:' }} <span id="quantity-display-{{ section.id }}">1</span></label>
+      <input type="range" 
+             id="quantity-slider-{{ section.id }}" 
+             min="{{ section.settings.min_quantity | default: 1 }}" 
+             max="{{ section.settings.max_quantity | default: 500 }}" 
+             value="1" 
+             class="quantity-slider">
+      <div class="quantity-input">
+        <button class="quantity-btn" onclick="decreaseQuantity('{{ section.id }}')">-</button>
+        <input type="number" 
+               id="quantity-number-{{ section.id }}" 
+               value="1" 
+               class="quantity-number" 
+               min="{{ section.settings.min_quantity | default: 1 }}">
+        <button class="quantity-btn" onclick="increaseQuantity('{{ section.id }}')">+</button>
+      </div>
+    </div>
+
+    {% if section.settings.show_tiers %}
+      <div class="pricing-tiers">
+        <h3>{{ section.settings.tiers_title | default: 'Bulk Pricing Options' }}</h3>
+        <div class="tiers-list" id="tiers-list-{{ section.id }}">
+          <!-- Tiers will be populated by JavaScript -->
+        </div>
+      </div>
+    {% endif %}
+
+    <button class="add-to-cart-btn" onclick="addToCart('{{ section.id }}')">
+      {{ section.settings.add_to_cart_text | default: 'Add' }} <span id="cart-quantity-{{ section.id }}">1</span> {{ section.settings.to_cart_text | default: 'to Cart' }} - <span id="cart-total-{{ section.id }}">${{ section.settings.default_price | default: '9.99' }}</span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .volume-pricing-section {
+    padding: {{ section.settings.section_padding | default: 40 }}px 0;
+    background-color: {{ section.settings.background_color | default: '#fafafa' }};
+  }
+  
+  .section-header {
+    text-align: center;
+    margin-bottom: {{ section.settings.title_margin | default: 30 }}px;
+  }
+  
+  .section-header h2 {
+    font-size: {{ section.settings.title_size | default: 24 }}px;
+    color: {{ section.settings.title_color | default: '#4a4a4a' }};
+    margin-bottom: 10px;
+  }
+  
+  .section-header p {
+    color: {{ section.settings.subtitle_color | default: '#666' }};
+    font-size: {{ section.settings.subtitle_size | default: 16 }}px;
+  }
+  
+  .volume-pricing-container {
+    font-family: {{ section.settings.font_family | default: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif' }};
+    max-width: {{ section.settings.container_width | default: 600 }}px;
+    margin: 0 auto;
+    padding: {{ section.settings.container_padding | default: 20 }}px;
+    background: {{ section.settings.container_background | default: 'white' }};
+    border-radius: {{ section.settings.border_radius | default: 12 }}px;
+    box-shadow: {{ section.settings.box_shadow | default: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }};
+  }
+  
+  .product-selector {
+    margin-bottom: {{ section.settings.element_spacing | default: 24 }}px;
+  }
+  
+  .product-selector label {
+    display: block;
+    font-weight: 500;
+    color: {{ section.settings.text_color | default: '#4a4a4a' }};
+    margin-bottom: 8px;
+  }
+  
+  .product-dropdown {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid {{ section.settings.border_color | default: '#e0e0e0' }};
+    border-radius: {{ section.settings.input_border_radius | default: 8 }}px;
+    font-size: 16px;
+    background: white;
+    color: {{ section.settings.text_color | default: '#4a4a4a' }};
+  }
+  
+  .pricing-display {
+    text-align: center;
+    margin-bottom: {{ section.settings.element_spacing | default: 24 }}px;
+    padding: 20px;
+    background: {{ section.settings.pricing_background | default: '#f5f5f5' }};
+    border-radius: {{ section.settings.input_border_radius | default: 8 }}px;
+  }
+  
+  .current-price {
+    font-size: {{ section.settings.price_size | default: 32 }}px;
+    font-weight: 700;
+    color: {{ section.settings.accent_color | default: '#8b7355' }};
+  }
+  
+  .total-price {
+    font-size: 18px;
+    color: {{ section.settings.text_color | default: '#4a4a4a' }};
+    margin-top: 8px;
+  }
+  
+  .quantity-selector {
+    margin-bottom: {{ section.settings.element_spacing | default: 24 }}px;
+  }
+  
+  .quantity-slider {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: {{ section.settings.border_color | default: '#e0e0e0' }};
+    outline: none;
+    margin-bottom: 16px;
+    -webkit-appearance: none;
+  }
+  
+  .quantity-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: {{ section.settings.button_color | default: '#a67c52' }};
+    cursor: pointer;
+  }
+  
+  .quantity-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    max-width: 200px;
+    margin: 0 auto;
+  }
+  
+  .quantity-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid {{ section.settings.border_color | default: '#e0e0e0' }};
+    background: white;
+    border-radius: {{ section.settings.input_border_radius | default: 8 }}px;
+    font-size: 18px;
+    font-weight: 600;
+    color: {{ section.settings.text_color | default: '#4a4a4a' }};
+    cursor: pointer;
+  }
+  
+  .quantity-number {
+    width: 80px;
+    height: 40px;
+    text-align: center;
+    border: 1px solid {{ section.settings.border_color | default: '#e0e0e0' }};
+    border-radius: {{ section.settings.input_border_radius | default: 8 }}px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .pricing-tiers {
+    margin-bottom: {{ section.settings.element_spacing | default: 24 }}px;
+  }
+  
+  .tiers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .tier-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid {{ section.settings.border_color | default: '#e0e0e0' }};
+    border-radius: {{ section.settings.input_border_radius | default: 8 }}px;
+    background: white;
+  }
+  
+  .tier-item.active {
+    border-color: {{ section.settings.accent_color | default: '#8b7355' }};
+    background: rgba(139, 115, 85, 0.05);
+  }
+  
+  .add-to-cart-btn {
+    width: 100%;
+    padding: 16px;
+    background: {{ section.settings.button_color | default: '#a67c52' }};
+    color: white;
+    border: none;
+    border-radius: {{ section.settings.input_border_radius | default: 8 }}px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .add-to-cart-btn:hover {
+    background: {{ section.settings.button_hover_color | default: '#8b6b4a' }};
+  }
+  
+  @media (max-width: 768px) {
+    .volume-pricing-container {
+      padding: {{ section.settings.mobile_padding | default: 15 }}px;
+      margin: 0 {{ section.settings.mobile_margin | default: 10 }}px;
+    }
+    
+    .current-price {
+      font-size: {{ section.settings.mobile_price_size | default: 24 }}px;
+    }
+    
+    .quantity-input {
+      max-width: 150px;
+    }
+    
+    .quantity-number {
+      width: 60px;
+    }
+  }
+</style>
+
+<script>
+  // Pricing data - this will be populated from admin configuration
+  let pricingData = {
+    'tote-bag': {
+      name: '{{ section.settings.default_product_name | default: "Custom Tote Bag" }}',
+      basePrice: {{ section.settings.default_price | default: 9.99 }},
+      tiers: [
+        { min: 1, max: 49, price: 9.99 },
+        { min: 50, max: 99, price: 5.00 },
+        { min: 100, max: 199, price: 2.50 },
+        { min: 200, max: 999, price: 1.99 }
+      ]
+    }
+  };
+
+  // Initialize volume pricing for this section
+  function initVolumePricing(sectionId) {
+    let selectedProduct = 'tote-bag';
+    let quantity = 1;
+
+    // Event listeners
+    document.getElementById(`product-select-${sectionId}`).addEventListener('change', function(e) {
+      selectedProduct = e.target.value;
+      quantity = 1;
+      updatePricing(sectionId);
+      updateTiers(sectionId);
+    });
+    
+    document.getElementById(`quantity-slider-${sectionId}`).addEventListener('input', function(e) {
+      quantity = parseInt(e.target.value);
+      updateQuantity(sectionId);
+      updatePricing(sectionId);
+      updateTiers(sectionId);
+    });
+    
+    document.getElementById(`quantity-number-${sectionId}`).addEventListener('input', function(e) {
+      quantity = Math.max(1, parseInt(e.target.value) || 1);
+      updateQuantity(sectionId);
+      updatePricing(sectionId);
+      updateTiers(sectionId);
+    });
+
+    function updateQuantity(sectionId) {
+      document.getElementById(`quantity-display-${sectionId}`).textContent = quantity;
+      document.getElementById(`quantity-slider-${sectionId}`).value = quantity;
+      document.getElementById(`quantity-number-${sectionId}`).value = quantity;
+      document.getElementById(`cart-quantity-${sectionId}`).textContent = quantity;
+    }
+
+    function updatePricing(sectionId) {
+      const product = pricingData[selectedProduct];
+      if (!product) return;
+      
+      document.getElementById(`product-name-${sectionId}`).textContent = product.name;
+      
+      const tier = product.tiers.find(t => quantity >= t.min && quantity <= t.max);
+      const price = tier ? tier.price : product.basePrice;
+      const total = price * quantity;
+      
+      document.getElementById(`current-price-${sectionId}`).textContent = `$${price.toFixed(2)}`;
+      document.getElementById(`total-price-${sectionId}`).textContent = `$${total.toFixed(2)}`;
+      document.getElementById(`cart-total-${sectionId}`).textContent = `$${total.toFixed(2)}`;
+    }
+
+    function updateTiers(sectionId) {
+      const product = pricingData[selectedProduct];
+      if (!product) return;
+      
+      const tiersList = document.getElementById(`tiers-list-${sectionId}`);
+      if (!tiersList) return;
+      
+      tiersList.innerHTML = '';
+      
+      product.tiers.forEach(tier => {
+        const tierItem = document.createElement('div');
+        tierItem.className = `tier-item ${quantity >= tier.min && quantity <= tier.max ? 'active' : ''}`;
+        tierItem.innerHTML = `
+          <span class="tier-range">${tier.min}-${tier.max} units</span>
+          <span class="tier-price">$${tier.price.toFixed(2)} each</span>
+        `;
+        tiersList.appendChild(tierItem);
+      });
+    }
+
+    // Initialize
+    updatePricing(sectionId);
+    updateTiers(sectionId);
+  }
+
+  // Global functions for buttons
+  window.increaseQuantity = function(sectionId) {
+    const quantityElement = document.getElementById(`quantity-number-${sectionId}`);
+    let quantity = parseInt(quantityElement.value) || 1;
+    quantity++;
+    quantityElement.value = quantity;
+    quantityElement.dispatchEvent(new Event('input'));
+  };
+
+  window.decreaseQuantity = function(sectionId) {
+    const quantityElement = document.getElementById(`quantity-number-${sectionId}`);
+    let quantity = parseInt(quantityElement.value) || 1;
+    if (quantity > 1) {
+      quantity--;
+      quantityElement.value = quantity;
+      quantityElement.dispatchEvent(new Event('input'));
+    }
+  };
+
+  window.addToCart = function(sectionId) {
+    const productSelect = document.getElementById(`product-select-${sectionId}`);
+    const quantityElement = document.getElementById(`quantity-number-${sectionId}`);
+    const selectedProduct = productSelect.value;
+    const quantity = parseInt(quantityElement.value) || 1;
+    
+    const product = pricingData[selectedProduct];
+    if (!product) return;
+    
+    const tier = product.tiers.find(t => quantity >= t.min && quantity <= t.max);
+    const price = tier ? tier.price : product.basePrice;
+    
+    // Shopify cart integration
+    if (typeof Shopify !== 'undefined' && Shopify.addItem) {
+      // Add to Shopify cart
+      Shopify.addItem({
+        id: getProductVariantId(selectedProduct, quantity),
+        quantity: quantity
+      });
+    } else {
+      // Fallback for testing
+      alert(`Added ${quantity} ${product.name}(s) to cart at $${price.toFixed(2)} each`);
+    }
+  };
+
+  function getProductVariantId(productType, quantity) {
+    // This would need to be configured with your actual Shopify product variant IDs
+    const variantMap = {
+      'tote-bag': {
+        1: 123456789, // Replace with actual variant ID for 1-49 units
+        50: 123456790, // Replace with actual variant ID for 50-99 units
+        100: 123456791, // Replace with actual variant ID for 100-199 units
+        200: 123456792  // Replace with actual variant ID for 200+ units
+      }
+    };
+    
+    const tiers = variantMap[productType];
+    if (!tiers) return null;
+    
+    for (let tier in tiers) {
+      if (quantity >= parseInt(tier)) {
+        return tiers[tier];
+      }
+    }
+    return tiers[1]; // Default to first tier
+  }
+
+  // Initialize when DOM is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    initVolumePricing('{{ section.id }}');
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Volume Pricing Tool",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show Section Title",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Bulk Pricing"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Section Subtitle",
+      "default": "Get better prices when you buy in bulk"
+    },
+    {
+      "type": "header",
+      "content": "Product Settings"
+    },
+    {
+      "type": "text",
+      "id": "default_product_name",
+      "label": "Default Product Name",
+      "default": "Custom Tote Bag"
+    },
+    {
+      "type": "number",
+      "id": "default_price",
+      "label": "Default Price",
+      "default": 9.99,
+      "step": 0.01
+    },
+    {
+      "type": "text",
+      "id": "product_label",
+      "label": "Product Selector Label",
+      "default": "Select Product:"
+    },
+    {
+      "type": "header",
+      "content": "Quantity Settings"
+    },
+    {
+      "type": "number",
+      "id": "min_quantity",
+      "label": "Minimum Quantity",
+      "default": 1
+    },
+    {
+      "type": "number",
+      "id": "max_quantity",
+      "label": "Maximum Quantity",
+      "default": 500
+    },
+    {
+      "type": "text",
+      "id": "quantity_label",
+      "label": "Quantity Label",
+      "default": "Quantity:"
+    },
+    {
+      "type": "header",
+      "content": "Display Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tiers",
+      "label": "Show Pricing Tiers",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "tiers_title",
+      "label": "Tiers Title",
+      "default": "Bulk Pricing Options"
+    },
+    {
+      "type": "text",
+      "id": "per_unit_text",
+      "label": "Per Unit Text",
+      "default": "per unit"
+    },
+    {
+      "type": "text",
+      "id": "total_label",
+      "label": "Total Label",
+      "default": "Total:"
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_text",
+      "label": "Add to Cart Text",
+      "default": "Add"
+    },
+    {
+      "type": "text",
+      "id": "to_cart_text",
+      "label": "To Cart Text",
+      "default": "to Cart"
+    },
+    {
+      "type": "header",
+      "content": "Styling"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section Background Color",
+      "default": "#fafafa"
+    },
+    {
+      "type": "color",
+      "id": "container_background",
+      "label": "Container Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#4a4a4a"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#8b7355"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button Color",
+      "default": "#a67c52"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_color",
+      "label": "Button Hover Color",
+      "default": "#8b6b4a"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "color",
+      "id": "pricing_background",
+      "label": "Pricing Display Background",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "label": "Container Width",
+      "min": 400,
+      "max": 800,
+      "step": 50,
+      "default": 600,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "Section Padding",
+      "min": 20,
+      "max": 80,
+      "step": 10,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "container_padding",
+      "label": "Container Padding",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border Radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "default": 12,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "input_border_radius",
+      "label": "Input Border Radius",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "default": 8,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "element_spacing",
+      "label": "Element Spacing",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "default": 24,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Title Font Size",
+      "min": 16,
+      "max": 36,
+      "step": 2,
+      "default": 24,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "price_size",
+      "label": "Price Font Size",
+      "min": 20,
+      "max": 48,
+      "step": 2,
+      "default": 32,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Mobile Settings"
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding",
+      "label": "Mobile Container Padding",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "default": 15,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_margin",
+      "label": "Mobile Container Margin",
+      "min": 5,
+      "max": 20,
+      "step": 5,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_price_size",
+      "label": "Mobile Price Font Size",
+      "min": 16,
+      "max": 32,
+      "step": 2,
+      "default": 24,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Volume Pricing Tool",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %} 

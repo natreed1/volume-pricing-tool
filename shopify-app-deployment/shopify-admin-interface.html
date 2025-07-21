@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volume Pricing Admin - Shopify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --background-color: #fafafa;
+            --text-color: #4a4a4a;
+            --accent-color: #8b7355;
+            --button-color: #a67c52;
+            --border-color: #e0e0e0;
+            --highlight-color: #f5f5f5;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .admin-header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .admin-header h1 {
+            font-size: 32px;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        .admin-header p {
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 16px;
+        }
+
+        .admin-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .product-list {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-list h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 20px;
+        }
+
+        .product-selector {
+            margin-bottom: 25px;
+        }
+
+        .product-dropdown {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .remove-product-btn {
+            width: 100%;
+            padding: 10px 15px;
+            background: var(--error-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .remove-product-btn:hover {
+            background: #d32f2f;
+        }
+
+        .add-product {
+            border-top: 1px solid var(--border-color);
+            padding-top: 25px;
+        }
+
+        .add-product h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .add-product-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .product-name-input,
+        .product-price-input {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .add-product-btn {
+            padding: 10px 15px;
+            background: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-product-btn:hover {
+            background: #388e3c;
+        }
+
+        .pricing-config {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .pricing-config h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 20px;
+        }
+
+        .base-price {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--highlight-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .base-price label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+
+        .base-price-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .tiers-config h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 20px;
+        }
+
+        .tier-config {
+            background: var(--highlight-color);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .tier-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .tier-input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tier-input-group label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+
+        .tier-input {
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .remove-tier-btn {
+            padding: 8px 12px;
+            background: var(--error-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .remove-tier-btn:hover {
+            background: #d32f2f;
+        }
+
+        .add-tier-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 25px;
+        }
+
+        .add-tier-btn:hover {
+            background: #7a6347;
+        }
+
+        .pricing-preview {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .pricing-preview h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .preview-tiers {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .preview-tier {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: var(--highlight-color);
+            border-radius: 6px;
+        }
+
+        .preview-tier span:first-child {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .preview-tier span:last-child {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .save-config-btn,
+        .export-config-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .save-config-btn {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .save-config-btn:hover {
+            background: #388e3c;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .export-config-btn {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .export-config-btn:hover {
+            background: #7a6347;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .customer-preview {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        .customer-preview h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 20px;
+        }
+
+        .preview-container {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            background: var(--highlight-color);
+        }
+
+        @media (max-width: 768px) {
+            .admin-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .tier-inputs {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .admin-actions {
+                flex-direction: column;
+            }
+            
+            .admin-container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Volume Pricing Configuration</h1>
+            <p>Configure bulk pricing rules for your Shopify store</p>
+        </div>
+
+        <div class="admin-content">
+            <div class="product-list">
+                <h3>Products</h3>
+                <div class="product-selector">
+                    <select id="product-dropdown" class="product-dropdown">
+                        <!-- Products will be populated by JavaScript -->
+                    </select>
+                    <button class="remove-product-btn" id="remove-product-btn" style="display: none;">
+                        Remove Product
+                    </button>
+                </div>
+
+                <div class="add-product">
+                    <h4>Add New Product</h4>
+                    <div class="add-product-form">
+                        <input type="text" id="new-product-name" placeholder="Product Name" class="product-name-input">
+                        <input type="number" id="new-product-price" placeholder="Base Price" class="product-price-input" step="0.01" min="0">
+                        <button class="add-product-btn">Add Product</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pricing-config" id="pricing-config">
+                <h3>Select a product to configure pricing</h3>
+                <!-- Pricing configuration will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="admin-actions">
+            <button class="save-config-btn">Save Configuration</button>
+            <button class="export-config-btn">Export Configuration</button>
+        </div>
+
+        <div class="customer-preview">
+            <h3>Customer Preview</h3>
+            <div class="preview-container">
+                <p>This is how your volume pricing tool will appear to customers:</p>
+                <div id="customer-preview-content">
+                    <!-- Customer preview will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="shopify-admin-app.js"></script>
+    <script>
+        // Initialize the admin interface
+        document.addEventListener('DOMContentLoaded', function() {
+            new VolumePricingAdmin();
+        });
+    </script>
+</body>
+</html> 

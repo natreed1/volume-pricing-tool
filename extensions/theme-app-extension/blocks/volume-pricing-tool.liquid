@@ -1,0 +1,149 @@
+{% comment %}
+  Volume Pricing Tool Block
+  This block can be added to product pages to display the volume pricing tool
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Volume Pricing Tool",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Volume Pricing"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tool",
+      "label": "Show Volume Pricing Tool",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Pricing Configuration"
+    },
+    {
+      "type": "text",
+      "id": "product_id",
+      "label": "Product ID",
+      "info": "Enter the product ID for this pricing tool"
+    },
+    {
+      "type": "number",
+      "id": "base_price",
+      "label": "Base Price",
+      "default": 999
+    }
+  ]
+}
+{% endschema %}
+
+<div class="volume-pricing-tool-block" {{ block.shopify_attributes }}>
+  <div class="volume-pricing-container">
+    <h3 class="volume-pricing-title">{{ block.settings.title | default: 'Volume Pricing' }}</h3>
+    
+    <div class="volume-pricing-tool" id="volume-pricing-tool">
+      <!-- Volume pricing tool will be loaded here -->
+      <div class="loading">Loading volume pricing...</div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .volume-pricing-tool-block {
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fafafa;
+  }
+  
+  .volume-pricing-title {
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #4a4a4a;
+  }
+  
+  .volume-pricing-container {
+    max-width: 100%;
+  }
+  
+  .loading {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+  }
+</style>
+
+<script>
+  // Initialize volume pricing tool when block loads
+  document.addEventListener('DOMContentLoaded', function() {
+    const toolContainer = document.getElementById('volume-pricing-tool');
+    if (toolContainer) {
+      // Load the volume pricing tool
+      loadVolumePricingTool();
+    }
+  });
+  
+  function loadVolumePricingTool() {
+    // This would load your React app or vanilla JS tool
+    // For now, we'll show a placeholder
+    const container = document.getElementById('volume-pricing-tool');
+    if (container) {
+      container.innerHTML = `
+        <div class="volume-pricing-placeholder">
+          <h4>Volume Pricing Tool</h4>
+          <p>Configure your volume pricing tiers in the app settings.</p>
+          <div class="pricing-preview">
+            <div class="tier">
+              <span>1-49 units:</span>
+              <span>$9.99 each</span>
+            </div>
+            <div class="tier">
+              <span>50-99 units:</span>
+              <span>$5.00 each</span>
+            </div>
+            <div class="tier">
+              <span>100+ units:</span>
+              <span>$2.50 each</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
+</script>
+
+<style>
+  .volume-pricing-placeholder {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .volume-pricing-placeholder h4 {
+    margin-bottom: 10px;
+    color: #4a4a4a;
+  }
+  
+  .pricing-preview {
+    margin-top: 15px;
+    text-align: left;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .tier {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .tier:last-child {
+    border-bottom: none;
+  }
+</style> 

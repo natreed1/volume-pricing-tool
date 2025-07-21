@@ -1,0 +1,59 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "volume-pricing-tool"
+client_id = "YOUR_CLIENT_ID"
+application_url = "https://your-app-domain.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products,read_products,write_metafields,read_metafields"
+
+[auth]
+redirect_urls = [
+  "https://your-app-domain.com/auth/callback",
+  "https://your-app-domain.com/auth/shopify/callback",
+  "https://your-app-domain.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-01"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "your-test-store.myshopify.com"
+
+[frontend]
+directory = "shopify-app-deployment"
+build_command = "npm run build"
+dev_url = "http://localhost:8000"
+
+[frontend.extension_directories]
+theme = "extensions/theme-app-extension"
+
+[frontend.extension_directories.blocks]
+theme = "extensions/theme-app-extension/blocks"
+
+[frontend.extension_directories.snippets]
+theme = "extensions/theme-app-extension/snippets"
+
+[frontend.extension_directories.assets]
+theme = "extensions/theme-app-extension/assets"
+
+[frontend.extension_directories.locales]
+theme = "extensions/theme-app-extension/locales"
+
+[frontend.extension_directories.config]
+theme = "extensions/theme-app-extension/config"
+
+[frontend.extension_directories.templates]
+theme = "extensions/theme-app-extension/templates"
+
+[frontend.extension_directories.layout]
+theme = "extensions/theme-app-extension/layout"
+
+[frontend.extension_directories.sections]
+theme = "extensions/theme-app-extension/sections" 

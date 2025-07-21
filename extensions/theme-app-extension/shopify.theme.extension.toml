@@ -1,0 +1,7 @@
+name = "volume-pricing-tool"
+type = "theme"
+
+[capabilities]
+theme_app_extension = { files = ["assets/*", "blocks/*", "snippets/*", "sections/*"] }
+
+[settings] 

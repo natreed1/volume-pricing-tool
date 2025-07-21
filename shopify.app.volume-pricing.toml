@@ -1,0 +1,27 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "3139e1c4b96a85ef2f2bea4901a34f39"
+name = "volume pricing "
+handle = "volume-pricing-4"
+application_url = "https://your-app-name.railway.app"
+embedded = true
+
+[webhooks]
+api_version = "2025-07"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products,read_products"
+
+[auth]
+redirect_urls = [ 
+  "https://your-app-name.railway.app/auth/callback",
+  "https://your-app-name.railway.app/auth/shopify/callback",
+  "https://your-app-name.railway.app/api/auth/callback"
+]
+
+[pos]
+embedded = false
+
+[build]
+include_config_on_deploy = true

@@ -1,0 +1,387 @@
+{% comment %}
+  Volume Pricing Tool Section
+  Add this section to your Shopify theme to display the volume pricing tool
+{% endcomment %}
+
+<div class="volume-pricing-section" id="volume-pricing-{{ section.id }}">
+  <div class="volume-pricing-container">
+    <div class="product-selector">
+      <label for="product-select-{{ section.id }}">Select Product:</label>
+      <select id="product-select-{{ section.id }}" class="product-dropdown">
+        <option value="tote-bag">Custom Tote Bag</option>
+        <option value="mug">Custom Mug</option>
+      </select>
+    </div>
+
+    <div class="pricing-display">
+      <h2 id="product-name-{{ section.id }}">Custom Tote Bag</h2>
+      <div class="price-info">
+        <span class="current-price" id="current-price-{{ section.id }}">$9.99</span>
+        <span class="per-unit">per unit</span>
+      </div>
+      <div class="total-price">
+        Total: <span class="total-amount" id="total-price-{{ section.id }}">$9.99</span>
+      </div>
+    </div>
+
+    <div class="quantity-selector">
+      <label for="quantity-slider-{{ section.id }}">Quantity: <span id="quantity-display-{{ section.id }}">1</span></label>
+      <input type="range" id="quantity-slider-{{ section.id }}" min="1" max="500" value="1" class="quantity-slider">
+      <div class="quantity-input">
+        <button class="quantity-btn" onclick="decreaseQuantity('{{ section.id }}')">-</button>
+        <input type="number" id="quantity-number-{{ section.id }}" value="1" class="quantity-number" min="1">
+        <button class="quantity-btn" onclick="increaseQuantity('{{ section.id }}')">+</button>
+      </div>
+    </div>
+
+    <div class="pricing-tiers">
+      <h3>Bulk Pricing Options</h3>
+      <div class="tiers-list" id="tiers-list-{{ section.id }}">
+        <!-- Tiers will be populated by JavaScript -->
+      </div>
+    </div>
+
+    <button class="add-to-cart-btn" onclick="addToCart('{{ section.id }}')">
+      Add <span id="cart-quantity-{{ section.id }}">1</span> to Cart - <span id="cart-total-{{ section.id }}">$9.99</span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .volume-pricing-section {
+    padding: 40px 0;
+  }
+  
+  .volume-pricing-container {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .product-selector {
+    margin-bottom: 24px;
+  }
+  
+  .product-selector label {
+    display: block;
+    font-weight: 500;
+    color: #4a4a4a;
+    margin-bottom: 8px;
+  }
+  
+  .product-dropdown {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    background: white;
+    color: #4a4a4a;
+  }
+  
+  .pricing-display {
+    text-align: center;
+    margin-bottom: 24px;
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 8px;
+  }
+  
+  .current-price {
+    font-size: 32px;
+    font-weight: 700;
+    color: #8b7355;
+  }
+  
+  .total-price {
+    font-size: 18px;
+    color: #4a4a4a;
+    margin-top: 8px;
+  }
+  
+  .quantity-selector {
+    margin-bottom: 24px;
+  }
+  
+  .quantity-slider {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #e0e0e0;
+    outline: none;
+    margin-bottom: 16px;
+    -webkit-appearance: none;
+  }
+  
+  .quantity-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #a67c52;
+    cursor: pointer;
+  }
+  
+  .quantity-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    max-width: 200px;
+    margin: 0 auto;
+  }
+  
+  .quantity-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #e0e0e0;
+    background: white;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #4a4a4a;
+    cursor: pointer;
+  }
+  
+  .quantity-number {
+    width: 80px;
+    height: 40px;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .pricing-tiers {
+    margin-bottom: 24px;
+  }
+  
+  .tiers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .tier-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+  }
+  
+  .tier-item.active {
+    border-color: #8b7355;
+    background: rgba(139, 115, 85, 0.05);
+  }
+  
+  .add-to-cart-btn {
+    width: 100%;
+    padding: 16px;
+    background: #a67c52;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .add-to-cart-btn:hover {
+    background: #8b6b4a;
+  }
+</style>
+
+<script>
+  // Pricing data
+  const pricingData = {
+    'tote-bag': {
+      name: 'Custom Tote Bag',
+      basePrice: 9.99,
+      tiers: [
+        { min: 1, max: 49, price: 9.99 },
+        { min: 50, max: 99, price: 5.00 },
+        { min: 100, max: 199, price: 2.50 },
+        { min: 200, max: 999, price: 1.99 }
+      ]
+    },
+    'mug': {
+      name: 'Custom Mug',
+      basePrice: 12.99,
+      tiers: [
+        { min: 1, max: 24, price: 12.99 },
+        { min: 25, max: 49, price: 8.99 },
+        { min: 50, max: 99, price: 6.99 },
+        { min: 100, max: 999, price: 4.99 }
+      ]
+    }
+  };
+
+  // Initialize volume pricing for this section
+  function initVolumePricing(sectionId) {
+    let selectedProduct = 'tote-bag';
+    let quantity = 1;
+
+    // Event listeners
+    document.getElementById(`product-select-${sectionId}`).addEventListener('change', function(e) {
+      selectedProduct = e.target.value;
+      quantity = 1;
+      updatePricing(sectionId);
+      updateTiers(sectionId);
+    });
+    
+    document.getElementById(`quantity-slider-${sectionId}`).addEventListener('input', function(e) {
+      quantity = parseInt(e.target.value);
+      updateQuantity(sectionId);
+      updatePricing(sectionId);
+      updateTiers(sectionId);
+    });
+    
+    document.getElementById(`quantity-number-${sectionId}`).addEventListener('input', function(e) {
+      quantity = Math.max(1, parseInt(e.target.value) || 1);
+      updateQuantity(sectionId);
+      updatePricing(sectionId);
+      updateTiers(sectionId);
+    });
+
+    function updateQuantity(sectionId) {
+      document.getElementById(`quantity-display-${sectionId}`).textContent = quantity;
+      document.getElementById(`quantity-slider-${sectionId}`).value = quantity;
+      document.getElementById(`quantity-number-${sectionId}`).value = quantity;
+      document.getElementById(`cart-quantity-${sectionId}`).textContent = quantity;
+    }
+
+    function updatePricing(sectionId) {
+      const product = pricingData[selectedProduct];
+      document.getElementById(`product-name-${sectionId}`).textContent = product.name;
+      
+      const tier = product.tiers.find(t => quantity >= t.min && quantity <= t.max);
+      const price = tier ? tier.price : product.basePrice;
+      const total = price * quantity;
+      
+      document.getElementById(`current-price-${sectionId}`).textContent = `$${price.toFixed(2)}`;
+      document.getElementById(`total-price-${sectionId}`).textContent = `$${total.toFixed(2)}`;
+      document.getElementById(`cart-total-${sectionId}`).textContent = `$${total.toFixed(2)}`;
+    }
+
+    function updateTiers(sectionId) {
+      const product = pricingData[selectedProduct];
+      const tiersList = document.getElementById(`tiers-list-${sectionId}`);
+      tiersList.innerHTML = '';
+      
+      product.tiers.forEach(tier => {
+        const tierItem = document.createElement('div');
+        tierItem.className = `tier-item ${quantity >= tier.min && quantity <= tier.max ? 'active' : ''}`;
+        tierItem.innerHTML = `
+          <span class="tier-range">${tier.min}-${tier.max} units</span>
+          <span class="tier-price">$${tier.price.toFixed(2)} each</span>
+        `;
+        tiersList.appendChild(tierItem);
+      });
+    }
+
+    // Initialize
+    updatePricing(sectionId);
+    updateTiers(sectionId);
+  }
+
+  // Global functions for buttons
+  window.increaseQuantity = function(sectionId) {
+    const quantityElement = document.getElementById(`quantity-number-${sectionId}`);
+    let quantity = parseInt(quantityElement.value) || 1;
+    quantity++;
+    quantityElement.value = quantity;
+    quantityElement.dispatchEvent(new Event('input'));
+  };
+
+  window.decreaseQuantity = function(sectionId) {
+    const quantityElement = document.getElementById(`quantity-number-${sectionId}`);
+    let quantity = parseInt(quantityElement.value) || 1;
+    if (quantity > 1) {
+      quantity--;
+      quantityElement.value = quantity;
+      quantityElement.dispatchEvent(new Event('input'));
+    }
+  };
+
+  window.addToCart = function(sectionId) {
+    const productSelect = document.getElementById(`product-select-${sectionId}`);
+    const quantityElement = document.getElementById(`quantity-number-${sectionId}`);
+    const selectedProduct = productSelect.value;
+    const quantity = parseInt(quantityElement.value) || 1;
+    
+    const product = pricingData[selectedProduct];
+    const tier = product.tiers.find(t => quantity >= t.min && quantity <= t.max);
+    const price = tier ? tier.price : product.basePrice;
+    
+    // Shopify cart integration
+    if (typeof Shopify !== 'undefined' && Shopify.addItem) {
+      // Add to Shopify cart
+      Shopify.addItem({
+        id: getProductVariantId(selectedProduct, quantity),
+        quantity: quantity
+      });
+    } else {
+      // Fallback for testing
+      alert(`Added ${quantity} ${product.name}(s) to cart at $${price.toFixed(2)} each`);
+    }
+  };
+
+  function getProductVariantId(productType, quantity) {
+    // This would need to be configured with your actual Shopify product variant IDs
+    const variantMap = {
+      'tote-bag': {
+        1: 123456789, // Replace with actual variant ID for 1-49 units
+        50: 123456790, // Replace with actual variant ID for 50-99 units
+        100: 123456791, // Replace with actual variant ID for 100-199 units
+        200: 123456792  // Replace with actual variant ID for 200+ units
+      },
+      'mug': {
+        1: 123456793, // Replace with actual variant ID for 1-24 units
+        25: 123456794, // Replace with actual variant ID for 25-49 units
+        50: 123456795, // Replace with actual variant ID for 50-99 units
+        100: 123456796  // Replace with actual variant ID for 100+ units
+      }
+    };
+    
+    const tiers = variantMap[productType];
+    for (let tier in tiers) {
+      if (quantity >= parseInt(tier)) {
+        return tiers[tier];
+      }
+    }
+    return tiers[1]; // Default to first tier
+  }
+
+  // Initialize when DOM is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    initVolumePricing('{{ section.id }}');
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Volume Pricing Tool",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Bulk Pricing"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Volume Pricing Tool",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %} 

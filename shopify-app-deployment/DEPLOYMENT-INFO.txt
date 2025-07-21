@@ -1,0 +1,24 @@
+Volume Pricing Tool - Shopify App
+================================
+
+Deployment Package Created: Mon Jul 21 11:51:00 JST 2025
+Version: 1.0.0
+
+Files Included:
+- shopify-app-deployment.html (Main app with React integration)
+- assets/ (React app assets)
+- shopify-admin-interface.html (Alternative admin interface)
+- shopify-admin-app.js (Admin functionality)
+- shopify-section.liquid (Theme section integration)
+- shopify-theme-section.liquid (Alternative theme section)
+- DEPLOYMENT-PACKAGE.md (Deployment guide)
+- SHOPIFY-DEPLOYMENT.md (Detailed deployment instructions)
+- SHOPIFY-COMPLETE-GUIDE.md (Complete setup guide)
+
+Quick Start:
+1. Upload all files to your web server
+2. Create a Shopify app in your admin panel
+3. Set the app URL to your hosted shopify-app-deployment.html
+4. Install and configure the app
+
+For detailed instructions, see DEPLOYMENT-PACKAGE.md
